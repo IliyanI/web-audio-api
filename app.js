@@ -1,16 +1,16 @@
 window.onload=function () {
 
-    let file=document.getElementById("audio-file");
-    let audio=document.getElementById("audio-tag");
+    var file=document.getElementById("audio-file");
+    var audio=document.getElementById("audio-tag");
 
     file.onchange=function () {
-        let files=this.files;
+        var files=this.files;
         audio.src=URL.createObjectURL(files[0]);
         audio.load();
         audio.play();
-        let context=new (window.AudioContext||window.webkitAudioContext);
-        let src=context.createMediaElementSource(audio);
-        let analyser=context.createAnalyser();
+        var context=new (window.AudioContext||window.webkitAudioContext);
+        var src=context.createMediaElementSource(audio);
+        var analyser=context.createAnalyser();
 
         const canvas=document.getElementById('canvas');
         canvas.width=canvas.offsetWidth;
@@ -27,10 +27,10 @@ window.onload=function () {
 
         var dataArray=new Uint8Array(bufferLength);
 
-        let width=canvas.offsetWidth;
-        let height=canvas.offsetHeight;
+        var width=canvas.width;
+        var height=canvas.height;
 
-        var barWidth=(width/bufferLength);
+        var barWidth=(width/bufferLength)*2;
         var barHeight;
         var x=0;
 
@@ -40,20 +40,21 @@ window.onload=function () {
 
             x=0;
 
-            analyser.getByteTimeDomainData(dataArray);
+            analyser.getByteFrequencyData(dataArray);
 
             canvasCtx.fillStyle='rgb(255, 255, 255)';
             canvasCtx.clearRect(0, 0, width, height);
 
-            for (let i=bufferLength; i>0; i--) {
-                barHeight=(dataArray[i]-128)*(i/bufferLength)*5;
+            for (var i=0; i<bufferLength; i++) {
+                barHeight=dataArray[i]*2;
 
-                let r=(barHeight-1)*3;
+                let r=barHeight;
                 let g=20;
-                let b=(barHeight-1);
+                let b=barHeight/2;
 
+                console.log('rgb('+r+','+g+','+b+')');
                 canvasCtx.fillStyle='rgb('+r+','+g+','+b+')';
-                canvasCtx.fillRect(x, height/2-(barHeight/2+5), barWidth, barHeight+5);
+                canvasCtx.fillRect(x, height-barHeight, barWidth, barHeight+5);
 
                 x+=barWidth+1;
             }
