@@ -1,10 +1,10 @@
-window.onload=function() {
-    let file=document.getElementById("audio-file")
-    let audio=document.getElementById("audio-tag")
+window.onload=function () {
+    let file=document.getElementById("audio-file");
+    let audio=document.getElementById("audio-tag");
 
-    file.onchange=function() {
+    file.onchange=function () {
         let files=this.files;
-        audio.src=URL.createObjectURL(files[0])
+        audio.src=URL.createObjectURL(files[0]);
         audio.load();
         audio.play();
         let audioCtx=new (window.AudioContext||window.webkitAudioContext);
@@ -12,23 +12,22 @@ window.onload=function() {
         let analyser=audioCtx.createAnalyser();
 
         const canvas=document.getElementById('canvas');
-        canvas.width=canvas.offsetWidth
-        canvas.height=canvas.offsetHeight
+        canvas.width=canvas.offsetWidth;
+        canvas.height=canvas.offsetHeight;
         let width=canvas.offsetWidth;
         let height=canvas.offsetHeight;
         const canvasCtx=canvas.getContext('2d');
-        canvasCtx.clearRect(0,0,width,height)
+        canvasCtx.clearRect(0, 0, width, height);
 
         src.connect(analyser);
         analyser.connect(audioCtx.destination);
         analyser.fftSize=256;
 
         var bufferLength=analyser.frequencyBinCount;
-        console.log(bufferLength);
 
         var dataArray=new Uint8Array(bufferLength);
 
-        var barWidth=(width/bufferLength)*2.5;
+        var barWidth=(width/bufferLength);
         var barHeight;
         var x=0;
 
@@ -39,18 +38,19 @@ window.onload=function() {
 
             analyser.getByteTimeDomainData(dataArray);
             canvasCtx.fillStyle='rgb(255, 255, 255)';
-            canvasCtx.fillRect(0,0,width,height);
+            // canvasCtx.fillRect(0, 0, width, height);
+            canvasCtx.clearRect(0, 0, width, height);
 
-            for(let i=0;i<bufferLength;i++) {
-                barHeight=(dataArray[i]-128)*2;
+            for (let i=bufferLength; i>0; i--) {
+                barHeight=(dataArray[i]-128)*(i/bufferLength)*5;
 
-                canvasCtx.fillStyle='rgb('+(barHeight-1)+','+(barHeight-1)+',50)';
-                canvasCtx.fillRect(x,height/2-(barHeight/2+50),barWidth,barHeight+50);
+                canvasCtx.fillStyle='rgb('+(barHeight-1)*3+',20,'+(barHeight-1)+')';
+                canvasCtx.fillRect(x, height/2-(barHeight/2+5), barWidth, barHeight+5);
                 x+=barWidth+1;
             }
         }
 
         audio.play();
         draw();
-    }
+    };
 }
